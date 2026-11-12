@@ -15,7 +15,7 @@ const ui = {
 };
 const picks = Array.from(document.querySelectorAll('.pick'));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const stacked = window.matchMedia('(max-aspect-ratio: 5/4)'); // narrow screens: the picture sits below the words
+const stacked = window.matchMedia('(max-aspect-ratio: 5/4)'); // narrow screens: the picture sits above the words
 
 // phase: idle, placing, side, returning, station
 const s = { phase: 'idle', topper: null };
@@ -95,8 +95,10 @@ function choose(id) {
   s.topper = id;
   showTopper(id);
   if (s.phase === 'idle') playSide();
-  // On a narrow screen the picture may be off the bottom: bring it and the status bar into view.
-  if (stacked.matches) el('top').scrollIntoView({ block: 'end', behavior: reduceMotion ? 'auto' : 'smooth' });
+  // On a narrow screen the picture is at the top of the page: go back up to it if it has been scrolled away.
+  if (stacked.matches && ui.video.getBoundingClientRect().top < 0) {
+    el('top').scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
 }
 
 picks.forEach((pick) => pick.addEventListener('click', () => choose(pick.dataset.topper)));

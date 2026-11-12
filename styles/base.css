@@ -203,54 +203,62 @@ h1 {
 #now-sub:empty { display: none; }
 
 @media (max-aspect-ratio: 5/4) {
-  /* Narrow screens: the words sit above the picture instead of beside it. */
+  /* Narrow screens: the picture comes first, with the headline and the chooser straight under it,
+     so choosing a topper and watching it turn happen in one view. */
   .hero {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: 100svh;
+    min-height: 0;
+    padding-bottom: 32px;
   }
   .hero::before { display: none; }
-  .hero-copy {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    width: min(34rem, calc(100% - 40px));
-    margin: clamp(24px, 5svh, 56px) auto 0;
-    text-align: center;
+  .hero-copy { display: contents; }
+  .hero-copy > * { margin-inline: 20px; }
+  .wordmark {
+    position: absolute;
+    z-index: 2;
+    top: 18px;
+    left: 0;
+    margin-block: 0;
+    text-shadow: 0 1px 12px rgba(20, 17, 15, 0.8);
   }
   .stage {
     position: relative;
+    order: 1;
     inset: auto;
-    flex: 1 0 400px;
     width: 100%;
-    margin-top: 8px;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%);
-    mask-image: linear-gradient(180deg, transparent 0%, #000 18%);
-    order: 2;
+    height: 46svh;
+    min-height: 260px;
+    max-height: 620px;
+    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
   }
-  .wordmark { margin-bottom: 0.9rem; }
-  h1 { font-size: clamp(2.1rem, 8.4vw, 3.4rem); }
-  .lede { margin: 0.9rem auto 0; }
-  .chooser { margin-top: 1.3rem; }
-  .pick { text-align: center; }
+  h1 {
+    order: 2;
+    margin-top: -4px;
+    font-size: clamp(1.9rem, 7.4vw, 3.2rem);
+  }
+  .chooser { order: 3; margin-top: 1.1rem; }
+  .chooser-label { margin-bottom: 0.6rem; }
+  .pick { padding: 6px 6px 9px; font-size: 0.82rem; }
   .chooser-line { min-height: 0; }
-  .actions { justify-content: center; margin-top: 1rem; }
-  .fineprint { margin-top: 0.8rem; }
-  /* The status bar sits under the picture rather than over it. */
+  /* The status bar sits in the flow under the chooser rather than over the picture. */
   .now {
     position: relative;
-    order: 3;
+    order: 4;
     left: auto;
     bottom: auto;
     transform: none;
     flex-wrap: wrap;
-    justify-content: center;
-    width: calc(100% - 32px);
     max-width: none;
-    margin: 12px auto 16px;
+    margin: 14px 20px 0;
+    padding: 12px 14px;
+    border-radius: 16px;
   }
-  .now-text { flex: 1 1 100%; text-align: center; }
+  .now-text { flex: 1 1 100%; }
   .now-dot { display: none; }
+  .lede { order: 5; margin-top: 1.4rem; max-width: none; }
+  .actions { order: 6; margin-top: 1.1rem; }
+  .fineprint { order: 7; margin-top: 0.9rem; }
 }
