@@ -1,21 +1,7 @@
 import { SIDE, STATION } from './songs.js';
 
-// A music box built from sine partials. The "record" path adds crackle and rolls off the
-// highs; the "station" path is clean with a light echo, so the handover is audible.
-
-function makeCrackle(ctx) {
-  const len = ctx.sampleRate * 3;
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) {
-    d[i] += (Math.random() * 2 - 1) * 0.012;
-    if (Math.random() < 0.0006) {
-      const a = (Math.random() * 0.6 + 0.15) * (Math.random() < 0.5 ? -1 : 1);
-      for (let k = 0; k < 30 && i + k < len; k++) d[i + k] += a * Math.exp(-k / 5);
-    }
-  }
-  return buf;
-}
+// A music box built from sine partials. The "record" path rolls off the highs; the "station"
+// path is clean with a light echo, so the handover from record to topper is audible.
 
 const PARTIALS = [[1, 1], [2, 0.35], [4.1, 0.1]];
 
@@ -27,7 +13,6 @@ export class MusicBox {
     this.station = null;
     this.stationTimer = null;
     this.stationIndex = 0;
-    this.crackle = null;
   }
 
   ensure() {
@@ -46,14 +31,6 @@ export class MusicBox {
     lp.type = 'lowpass';
     lp.frequency.value = 3600;
     this.recordBus.connect(lp).connect(this.master);
-
-    this.crackleGain = ctx.createGain();
-    this.crackleGain.gain.value = 0;
-    const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 900;
-    this.crackleGain.connect(hp).connect(this.master);
-    this.crackleBuffer = makeCrackle(ctx);
 
     this.stationBus = ctx.createGain();
     this.stationBus.connect(this.master);
@@ -114,14 +91,7 @@ export class MusicBox {
   // Starts the record side and returns how long it lasts, in seconds.
   startSide() {
     this.ensure();
-    const ctx = this.ctx;
     const lead = 1.0;
-    this.crackle = ctx.createBufferSource();
-    this.crackle.buffer = this.crackleBuffer;
-    this.crackle.loop = true;
-    this.crackle.connect(this.crackleGain);
-    this.crackle.start();
-    this.crackleGain.gain.setTargetAtTime(0.5, ctx.currentTime, 0.1);
     this.side = this._play(SIDE, this.recordBus, lead);
     return SIDE.duration + lead;
   }
@@ -130,10 +100,6 @@ export class MusicBox {
     if (!this.ctx) return;
     this.side?.stop(0.25);
     this.side = null;
-    this.crackleGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.08);
-    const src = this.crackle;
-    this.crackle = null;
-    if (src) setTimeout(() => { try { src.stop(); } catch { /* already stopped */ } }, 600);
   }
 
   startStation() {

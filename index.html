@@ -11,22 +11,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/base.css">
 <link rel="stylesheet" href="styles/sections.css">
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-} }
-</script>
 </head>
 <body>
 <header class="hero" id="top">
-  <canvas id="stage" aria-label="A walnut and brass record player with a reindeer carousel topper turning on the record"></canvas>
+  <div class="stage">
+    <img class="stage-media" id="stage-still" src="assets/player.jpg" width="1920" height="1080" alt="A walnut and brass record player with its clear cover open and a record on the platter">
+    <video class="stage-media" id="stage-video" muted loop playsinline preload="none" hidden></video>
+  </div>
   <div class="hero-copy">
     <p class="wordmark">Roundabout</p>
     <h1>Art that turns with your record.</h1>
     <p class="lede">A record player with collectible toppers. When the side ends, the topper keeps the music going.</p>
+    <div class="chooser" role="group" aria-labelledby="chooser-label">
+      <p class="chooser-label" id="chooser-label">Choose a topper to place it on the record</p>
+      <div class="chooser-row">
+        <button class="pick" type="button" data-topper="reindeer" aria-pressed="false">
+          <img src="assets/topper-reindeer.jpg" width="1280" height="720" alt="">
+          <span>Reindeer Carousel</span>
+        </button>
+        <button class="pick" type="button" data-topper="cabin" aria-pressed="false">
+          <img src="assets/topper-cabin.jpg" width="1280" height="720" alt="">
+          <span>Mill Cabin</span>
+        </button>
+        <button class="pick" type="button" data-topper="nativity" aria-pressed="false">
+          <img src="assets/topper-nativity.jpg" width="1280" height="720" alt="">
+          <span>Nativity</span>
+        </button>
+      </div>
+      <p class="chooser-line" id="chooser-line" aria-live="polite"></p>
+    </div>
     <div class="actions">
-      <button id="cta" class="btn btn-primary" type="button">Place the topper</button>
       <a class="btn btn-ghost" href="#waitlist">Join the waitlist</a>
     </div>
     <p class="fineprint">Concept preview with sound. Not yet a product you can buy.</p>
@@ -69,11 +83,44 @@
 <section class="sx-section" id="toppers" aria-labelledby="sx-toppers-title">
   <div class="sx-wrap">
     <h2 class="sx-title" id="sx-toppers-title">More toppers</h2>
-    <p class="sx-intro">The reindeer carousel is only the first idea. A topper can be any scene that looks good turning once every 1.8 seconds, in any season. Here are a few we are thinking about.</p>
+    <p class="sx-intro">The three toppers above are only the first ideas. A topper can be any scene that looks good turning once every 1.8 seconds, in any season. Here are a few more we are thinking about.</p>
     <fieldset class="sx-vote">
       <legend class="sx-legend">Which would you want first?</legend>
       <p class="sx-hint" id="sx-vote-hint">Pick one. It is a vote, and it carries into the waitlist form below.</p>
       <div class="sx-shelf" aria-describedby="sx-vote-hint">
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="reindeer">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-reindeer.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Reindeer Carousel</span>
+            <span class="sx-card-line">Reindeer and a sleigh galloping round a still tree.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="cabin">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-cabin.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Mill Cabin</span>
+            <span class="sx-card-line">A log cabin with a turning mill wheel and smoke rising from the chimney.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="nativity">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-nativity.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Nativity</span>
+            <span class="sx-card-line">The stable stays facing you while three kings circle it on camels.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
 
         <label class="sx-card">
           <input class="sx-radio" type="radio" name="topper" value="jazz-trio">
@@ -188,27 +235,6 @@
           </span>
         </label>
 
-        <label class="sx-card sx-card-current">
-          <input class="sx-radio" type="radio" name="topper" value="snow-globe">
-          <span class="sx-card-body">
-            <span class="sx-mark" aria-hidden="true"></span>
-            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
-              <circle cx="60" cy="54" r="40" fill="none" stroke="currentColor" stroke-width="3"/>
-              <path d="M32 92h56l6 20H26z"/>
-              <path d="M44 84L52 62l8 22z"/>
-              <path d="M58 84L68 54l10 30z"/>
-              <circle cx="40" cy="40" r="2"/>
-              <circle cx="56" cy="32" r="2"/>
-              <circle cx="76" cy="38" r="2"/>
-              <circle cx="86" cy="56" r="2"/>
-              <circle cx="34" cy="62" r="2"/>
-            </svg>
-            <span class="sx-card-name">Reindeer carousel</span>
-            <span class="sx-card-line">The one in the preview: reindeer and a sleigh circling a still tree.</span>
-            <span class="sx-tag">In the preview above</span>
-          </span>
-        </label>
-
       </div>
     </fieldset>
   </div>
@@ -230,12 +256,15 @@
         <label class="sx-label" for="sx-topper-select">Which topper would you want first?</label>
         <select class="sx-input sx-select" id="sx-topper-select" name="topper">
           <option value="">No preference</option>
+          <option value="reindeer">Reindeer Carousel</option>
+          <option value="cabin">Mill Cabin</option>
+          <option value="nativity">Nativity</option>
           <option value="jazz-trio">Jazz trio</option>
           <option value="ballerina">Ballerina</option>
           <option value="lighthouse">Lighthouse at sea</option>
           <option value="carousel">Carousel horses</option>
           <option value="skyline">City at night</option>
-          <option value="snow-globe">Reindeer carousel</option>
+
         </select>
       </div>
       <button class="btn btn-primary sx-submit" id="sx-submit" type="submit">Join the waitlist</button>

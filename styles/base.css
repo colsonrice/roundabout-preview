@@ -32,15 +32,24 @@ body {
   min-height: 640px;
   overflow: hidden;
 }
-#stage {
+/* The picture: the player on its own, then a clip of the chosen topper turning on the record. */
+.stage {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 70%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+}
+.stage-media {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
-  cursor: grab;
+  object-fit: cover;
 }
-#stage:active { cursor: grabbing; }
+#stage-video { opacity: 0; transition: opacity 0.45s ease; }
+#stage-video.is-on { opacity: 1; }
 .hero::before {
   content: '';
   position: absolute;
@@ -83,11 +92,56 @@ h1 {
   color: var(--muted);
   max-width: 26rem;
 }
+.chooser { margin-top: 1.7rem; pointer-events: auto; }
+.chooser-label {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.chooser-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.pick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(23, 19, 15, 0.72);
+  color: var(--cream);
+  font: 500 0.86rem/1.25 var(--body);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.pick img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.pick:hover { border-color: rgba(243, 236, 223, 0.45); }
+.pick:active { transform: scale(0.98); }
+.pick:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.pick[aria-pressed='true'] { border-color: var(--brass); color: var(--brass); }
+.chooser-line {
+  margin: 0.8rem 0 0;
+  min-height: 2.9em;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 .fineprint {
   margin: 1.2rem 0 0;
@@ -149,22 +203,54 @@ h1 {
 #now-sub:empty { display: none; }
 
 @media (max-aspect-ratio: 5/4) {
-  .hero::before {
-    background: linear-gradient(180deg, rgba(20, 17, 15, 0.88) 0%, rgba(20, 17, 15, 0.45) 34%, rgba(20, 17, 15, 0) 56%);
+  /* Narrow screens: the words sit above the picture instead of beside it. */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100svh;
   }
+  .hero::before { display: none; }
   .hero-copy {
-    left: 50%;
-    top: clamp(28px, 6svh, 64px);
-    transform: translateX(-50%);
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
     width: min(34rem, calc(100% - 40px));
+    margin: clamp(24px, 5svh, 56px) auto 0;
     text-align: center;
+  }
+  .stage {
+    position: relative;
+    inset: auto;
+    flex: 1 0 400px;
+    width: 100%;
+    margin-top: 8px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 18%);
+    order: 2;
   }
   .wordmark { margin-bottom: 0.9rem; }
   h1 { font-size: clamp(2.1rem, 8.4vw, 3.4rem); }
   .lede { margin: 0.9rem auto 0; }
-  .actions { justify-content: center; margin-top: 1.3rem; }
+  .chooser { margin-top: 1.3rem; }
+  .pick { text-align: center; }
+  .chooser-line { min-height: 0; }
+  .actions { justify-content: center; margin-top: 1rem; }
   .fineprint { margin-top: 0.8rem; }
-  .now { bottom: 16px; flex-wrap: wrap; justify-content: center; width: calc(100% - 32px); }
+  /* The status bar sits under the picture rather than over it. */
+  .now {
+    position: relative;
+    order: 3;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: calc(100% - 32px);
+    max-width: none;
+    margin: 12px auto 16px;
+  }
   .now-text { flex: 1 1 100%; text-align: center; }
   .now-dot { display: none; }
 }
