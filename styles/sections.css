@@ -1,0 +1,248 @@
+/* Sections below the hero. All classes are prefixed sx-. */
+
+.sx-section {
+  --sx-error: #ee9a93;
+  border-top: 1px solid var(--line);
+  padding-block: clamp(64px, 10vw, 128px);
+}
+.sx-wrap {
+  width: 100%;
+  max-width: calc(1120px + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.sx-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.sx-intro {
+  margin: 1.1rem 0 0;
+  max-width: 36rem;
+  color: var(--muted);
+}
+
+/* How it works */
+.sx-steps {
+  list-style: none;
+  margin: clamp(36px, 5vw, 64px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.sx-step {
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+.sx-step-num {
+  display: block;
+  margin-bottom: 0.9rem;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--brass);
+}
+.sx-step-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.sx-step-text {
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+  max-width: 24rem;
+}
+
+/* Shelf and vote */
+.sx-vote {
+  margin: clamp(32px, 4vw, 56px) 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.sx-legend {
+  padding: 0;
+  font-family: var(--display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--cream);
+}
+.sx-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.sx-shelf {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.sx-card {
+  position: relative;
+  display: block;
+  min-width: 0;
+  cursor: pointer;
+}
+.sx-radio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.sx-card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  padding: 16px 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-raised);
+  color: var(--muted);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.sx-card:hover .sx-card-body { border-color: rgba(243, 236, 223, 0.4); }
+.sx-radio:checked + .sx-card-body {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+.sx-radio:focus-visible + .sx-card-body {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+.sx-mark {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.sx-radio:checked + .sx-card-body .sx-mark {
+  background: var(--brass);
+  border-color: var(--brass);
+  box-shadow: inset 0 0 0 3px var(--bg-raised);
+}
+.sx-art {
+  display: block;
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  aspect-ratio: 1;
+  margin-bottom: 14px;
+}
+.sx-card-name {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: var(--cream);
+}
+.sx-card-line {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.sx-tag {
+  margin-top: 0.9rem;
+  padding: 3px 10px;
+  border: 1px solid var(--brass);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--brass);
+}
+
+/* Waitlist */
+.sx-waitlist-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+.sx-form {
+  display: grid;
+  gap: 22px;
+  max-width: 30rem;
+}
+.sx-field { display: grid; gap: 8px; min-width: 0; }
+.sx-label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--cream);
+}
+.sx-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  color: var(--cream);
+  font: 400 1rem var(--body);
+  color-scheme: dark;
+}
+.sx-input:hover { border-color: rgba(243, 236, 223, 0.4); }
+.sx-input:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.sx-input[aria-invalid='true'] { border-color: var(--sx-error); }
+.sx-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23c2b6a3' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+.sx-error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--sx-error);
+}
+.sx-submit { justify-self: start; }
+.sx-submit:disabled { opacity: 0.6; cursor: default; }
+.sx-status {
+  margin: 0;
+  padding: 2px 0 2px 14px;
+  border-left: 2px solid var(--brass);
+  font-size: 0.95rem;
+  color: var(--cream);
+}
+.sx-status[data-kind='failure'] { border-left-color: var(--sx-error); }
+
+/* Footer */
+.sx-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 36px 48px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.sx-footer p { margin: 0; }
+.sx-footer p + p { margin-top: 0.3rem; }
+
+@media (min-width: 760px) {
+  .sx-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 4vw, 56px); }
+  .sx-shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .sx-card-body { padding: 20px 20px 22px; }
+  .sx-waitlist-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 30rem); gap: clamp(40px, 8vw, 112px); align-items: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sx-card-body, .sx-mark { transition: none; }
+}

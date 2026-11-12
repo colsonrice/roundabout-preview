@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roundabout: art that turns with your record</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="A concept record player with collectible toppers that turn with your record and keep the music going when the side ends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/sections.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="hero" id="top">
+  <canvas id="stage" aria-label="A record player with a snow-globe topper turning on the record"></canvas>
+  <div class="hero-copy">
+    <p class="wordmark">Roundabout</p>
+    <h1>Art that turns with your record.</h1>
+    <p class="lede">A record player with collectible toppers. When the side ends, the topper keeps the music going.</p>
+    <div class="actions">
+      <button id="cta" class="btn btn-primary" type="button">Place the topper</button>
+      <a class="btn btn-ghost" href="#waitlist">Join the waitlist</a>
+    </div>
+    <p class="fineprint">Concept preview with sound. Not yet a product you can buy.</p>
+  </div>
+  <div class="now" id="now" hidden>
+    <span class="now-dot" aria-hidden="true"></span>
+    <div class="now-text" aria-live="polite">
+      <p id="now-title"></p>
+      <p id="now-sub"></p>
+    </div>
+    <button id="now-action" class="btn btn-small" type="button" hidden></button>
+    <button id="mute" class="btn btn-small btn-quiet" type="button" aria-pressed="false">Sound on</button>
+  </div>
+</header>
+<main>
+<!-- sections:start -->
+<section class="sx-section" id="how-it-works" aria-labelledby="sx-how-title">
+  <div class="sx-wrap">
+    <h2 class="sx-title" id="sx-how-title">How it works</h2>
+    <ol class="sx-steps">
+      <li class="sx-step">
+        <span class="sx-step-num" aria-hidden="true">1</span>
+        <h3 class="sx-step-title">Place a topper</h3>
+        <p class="sx-step-text">It tells the player what it is. No app, no account.</p>
+      </li>
+      <li class="sx-step">
+        <span class="sx-step-num" aria-hidden="true">2</span>
+        <h3 class="sx-step-title">Play your record</h3>
+        <p class="sx-step-text">The scene turns with the record, one turn every 1.8 seconds. No motor in the topper.</p>
+      </li>
+      <li class="sx-step">
+        <span class="sx-step-num" aria-hidden="true">3</span>
+        <h3 class="sx-step-title">The side ends, the music doesn't</h3>
+        <p class="sx-step-text">Each topper carries about an hour of music. No subscription.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sx-section" id="toppers" aria-labelledby="sx-toppers-title">
+  <div class="sx-wrap">
+    <h2 class="sx-title" id="sx-toppers-title">More toppers</h2>
+    <p class="sx-intro">The snow globe is only the first idea. A topper can be any scene that looks good turning once every 1.8 seconds, in any season. Here are a few we are thinking about.</p>
+    <fieldset class="sx-vote">
+      <legend class="sx-legend">Which would you want first?</legend>
+      <p class="sx-hint" id="sx-vote-hint">Pick one. It is a vote, and it carries into the waitlist form below.</p>
+      <div class="sx-shelf" aria-describedby="sx-vote-hint">
+
+        <label class="sx-card">
+          <input class="sx-radio" type="radio" name="topper" value="jazz-trio">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <path d="M56 16h8l6 10H50z"/>
+              <rect x="59" y="6" width="2" height="10"/>
+              <circle cx="26" cy="58" r="6"/>
+              <path d="M19 67h14l2 30H17z"/>
+              <ellipse cx="42" cy="88" rx="10" ry="14"/>
+              <rect x="40.5" y="50" width="3" height="30"/>
+              <circle cx="62" cy="64" r="6"/>
+              <path d="M55 72h14l1 22H54z"/>
+              <rect x="52" y="96" width="20" height="10" rx="2"/>
+              <rect x="70" y="72" width="14" height="2"/>
+              <circle cx="96" cy="60" r="6"/>
+              <path d="M89 68h14v26H89z"/>
+              <rect x="78" y="82" width="34" height="4"/>
+              <rect x="80" y="86" width="3" height="20"/>
+              <rect x="107" y="86" width="3" height="20"/>
+              <rect x="10" y="108" width="100" height="2"/>
+            </svg>
+            <span class="sx-card-name">Jazz trio</span>
+            <span class="sx-card-line">Piano, bass and drums in a quiet room, turning under one lamp.</span>
+          </span>
+        </label>
+
+        <label class="sx-card">
+          <input class="sx-radio" type="radio" name="topper" value="ballerina">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <circle cx="60" cy="17" r="4.5"/>
+              <circle cx="60" cy="27" r="7"/>
+              <path d="M55 34h10l-2 24h-6z"/>
+              <ellipse cx="60" cy="60" rx="21" ry="5"/>
+              <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+                <path d="M56 38Q42 32 37 20"/>
+                <path d="M64 38Q78 32 83 20"/>
+                <path d="M60 64V102"/>
+                <path d="M63 64L94 80"/>
+              </g>
+              <rect x="46" y="106" width="28" height="2"/>
+            </svg>
+            <span class="sx-card-name">Ballerina</span>
+            <span class="sx-card-line">A dancer on pointe, carried round by the platter.</span>
+          </span>
+        </label>
+
+        <label class="sx-card">
+          <input class="sx-radio" type="radio" name="topper" value="lighthouse">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <path d="M70 28L114 16V40z" fill-opacity="0.4"/>
+              <path d="M50 28L6 16V40z" fill-opacity="0.4"/>
+              <path d="M52 22L60 12L68 22z"/>
+              <rect x="54" y="22" width="12" height="12"/>
+              <rect x="48" y="34" width="24" height="4"/>
+              <path d="M50 88L54 38h12l4 50z"/>
+              <path d="M36 100L44 88h32l8 12z"/>
+              <path d="M0 100Q10 94 20 100T40 100T60 100T80 100T100 100T120 100V120H0z"/>
+            </svg>
+            <span class="sx-card-name">Lighthouse at sea</span>
+            <span class="sx-card-line">A slow beam sweeping over dark water.</span>
+          </span>
+        </label>
+
+        <label class="sx-card">
+          <input class="sx-radio" type="radio" name="topper" value="carousel">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <path d="M14 30L60 8l46 22z"/>
+              <path d="M14 30Q22 42 30 30T46 30T62 30T78 30T94 30T106 30z"/>
+              <rect x="48.5" y="34" width="3" height="66"/>
+              <ellipse cx="50" cy="72" rx="18" ry="9"/>
+              <path d="M60 68L70 50l8 2-6 20z"/>
+              <path d="M70 50l14 4 2 6-10-2z"/>
+              <path d="M34 66Q24 74 28 90Q30 76 38 72z"/>
+              <rect x="36" y="76" width="4" height="16"/>
+              <rect x="43" y="77" width="4" height="15"/>
+              <rect x="58" y="78" width="4" height="14"/>
+              <rect x="65" y="76" width="4" height="12"/>
+              <rect x="14" y="100" width="92" height="4"/>
+            </svg>
+            <span class="sx-card-name">Carousel horses</span>
+            <span class="sx-card-line">Painted horses rising and falling as they circle.</span>
+          </span>
+        </label>
+
+        <label class="sx-card">
+          <input class="sx-radio" type="radio" name="topper" value="skyline">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <circle cx="94" cy="24" r="9"/>
+              <circle cx="20" cy="18" r="1.5"/>
+              <circle cx="46" cy="12" r="1.5"/>
+              <circle cx="68" cy="22" r="1.5"/>
+              <rect x="8" y="70" width="16" height="40"/>
+              <rect x="26" y="52" width="12" height="58"/>
+              <rect x="40" y="40" width="18" height="70"/>
+              <rect x="48" y="28" width="2" height="12"/>
+              <rect x="60" y="62" width="14" height="48"/>
+              <rect x="76" y="48" width="18" height="62"/>
+              <rect x="96" y="74" width="16" height="36"/>
+            </svg>
+            <span class="sx-card-name">City at night</span>
+            <span class="sx-card-line">A skyline under a low moon, going quietly round.</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="snow-globe">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
+              <circle cx="60" cy="54" r="40" fill="none" stroke="currentColor" stroke-width="3"/>
+              <path d="M32 92h56l6 20H26z"/>
+              <path d="M44 84L52 62l8 22z"/>
+              <path d="M58 84L68 54l10 30z"/>
+              <circle cx="40" cy="40" r="2"/>
+              <circle cx="56" cy="32" r="2"/>
+              <circle cx="76" cy="38" r="2"/>
+              <circle cx="86" cy="56" r="2"/>
+              <circle cx="34" cy="62" r="2"/>
+            </svg>
+            <span class="sx-card-name">Winter evening</span>
+            <span class="sx-card-line">The snow globe from the preview, with falling snow.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+      </div>
+    </fieldset>
+  </div>
+</section>
+
+<section class="sx-section sx-waitlist" id="waitlist" aria-labelledby="sx-waitlist-title">
+  <div class="sx-wrap sx-waitlist-grid">
+    <div class="sx-waitlist-copy">
+      <h2 class="sx-title" id="sx-waitlist-title">Join the waitlist</h2>
+      <p class="sx-intro">Roundabout is a concept. Leave your email and a vote, and we will write to you if it goes further.</p>
+    </div>
+    <form class="sx-form" id="sx-waitlist-form" novalidate>
+      <div class="sx-field">
+        <label class="sx-label" for="sx-email">Email</label>
+        <input class="sx-input" id="sx-email" name="email" type="email" inputmode="email" autocomplete="email" required aria-describedby="sx-email-error">
+        <p class="sx-error" id="sx-email-error" hidden></p>
+      </div>
+      <div class="sx-field">
+        <label class="sx-label" for="sx-topper-select">Which topper would you want first?</label>
+        <select class="sx-input sx-select" id="sx-topper-select" name="topper">
+          <option value="">No preference</option>
+          <option value="jazz-trio">Jazz trio</option>
+          <option value="ballerina">Ballerina</option>
+          <option value="lighthouse">Lighthouse at sea</option>
+          <option value="carousel">Carousel horses</option>
+          <option value="skyline">City at night</option>
+          <option value="snow-globe">Winter evening</option>
+        </select>
+      </div>
+      <button class="btn btn-primary sx-submit" id="sx-submit" type="submit">Join the waitlist</button>
+      <p class="sx-status" id="sx-status" role="status" aria-live="polite" hidden></p>
+    </form>
+  </div>
+</section>
+
+<footer class="sx-footer">
+  <div class="sx-wrap">
+    <p>Roundabout is a concept in development.</p>
+    <p>The music in this preview is synthesized in your browser from public-domain melodies.</p>
+  </div>
+</footer>
+<!-- sections:end -->
+</main>
+<script type="module" src="src/main.js"></script>
+<script type="module" src="src/sections.js"></script>
+</body>
+</html>
