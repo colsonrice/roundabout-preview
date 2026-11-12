@@ -91,7 +91,7 @@ export class MusicBox {
   // Starts the record side and returns how long it lasts, in seconds.
   startSide() {
     this.ensure();
-    const lead = 1.0;
+    const lead = 0.4;
     this.side = this._play(SIDE, this.recordBus, lead);
     return SIDE.duration + lead;
   }

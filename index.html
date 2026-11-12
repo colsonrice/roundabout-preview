@@ -6,6 +6,7 @@
 <title>Roundabout: art that turns with your record</title>
 <meta name="robots" content="noindex">
 <meta name="description" content="A concept record player with collectible toppers that turn with your record and keep the music going when the side ends.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2317130f'/%3E%3Ccircle cx='16' cy='16' r='6.5' fill='%23d0a660'/%3E%3Ccircle cx='16' cy='16' r='1.6' fill='%2317130f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,17 +19,24 @@
     <img class="stage-media" id="stage-still" src="assets/player.jpg" width="1920" height="1080" alt="A walnut and brass record player with its clear cover open and a record on the platter">
     <video class="stage-media stage-clip" muted playsinline preload="none" tabindex="-1" aria-hidden="true"></video>
     <video class="stage-media stage-clip" muted playsinline preload="none" tabindex="-1" aria-hidden="true"></video>
-    <div class="stage-tools" id="stage-tools" hidden>
-      <p class="stage-hint">Drag to turn it by hand</p>
-      <button id="view" class="btn btn-small btn-quiet" type="button">Show the whole player</button>
+    <div class="stage-tools">
+      <p class="stage-hint" id="stage-hint" hidden>Drag to turn it by hand</p>
+      <button id="view" class="btn btn-small btn-quiet" type="button" hidden>Show the whole player</button>
+      <button id="mute" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute the sound" title="Sound is on">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/>
+          <path class="sound-on" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>
+          <path class="sound-off" d="M16 9.5l5 5M21 9.5l-5 5"/>
+        </svg>
+      </button>
     </div>
   </div>
   <div class="hero-copy">
     <p class="wordmark">Roundabout</p>
     <h1>Art that turns with your record.</h1>
-    <p class="lede">A record player with collectible toppers. When the side ends, the topper keeps the music going.</p>
+    <p class="lede"><span class="lede-lead">A record player with collectible toppers. </span>When the side ends, the topper keeps the music going.</p>
     <div class="chooser" role="group" aria-labelledby="chooser-label">
-      <p class="chooser-label" id="chooser-label">Choose a topper to place it on the record</p>
+      <p class="chooser-label" id="chooser-label">Choose a topper to place it. Plays with sound.</p>
       <div class="chooser-row">
         <button class="pick" type="button" data-topper="reindeer" aria-pressed="false">
           <img src="assets/topper-reindeer.jpg" width="1280" height="720" alt="">
@@ -67,21 +75,23 @@
           <span>Orrery</span>
         </button>
       </div>
-      <p class="chooser-line" id="chooser-line" aria-live="polite"></p>
+      <p class="chooser-line" id="chooser-line" aria-live="polite">The toppers marked “soon” are still being made.</p>
     </div>
     <div class="actions">
-      <a class="btn btn-ghost" href="#waitlist">Join the waitlist</a>
+      <a class="btn btn-ghost" id="cta" href="#waitlist">Join the waitlist</a>
     </div>
-    <p class="fineprint">Concept preview with sound. Not yet a product you can buy.</p>
+    <p class="fineprint">Concept preview. Not yet a product you can buy.</p>
   </div>
-  <div class="now" id="now" hidden>
-    <span class="now-dot" aria-hidden="true"></span>
+  <div class="now" id="now" data-phase="idle">
+    <ol class="now-steps" aria-hidden="true">
+      <li>Place a topper</li>
+      <li>Record plays</li>
+      <li>Topper plays on</li>
+    </ol>
     <div class="now-text" aria-live="polite">
-      <p id="now-title"></p>
-      <p id="now-sub"></p>
+      <p id="now-title">Place a topper to start the record</p>
+      <p id="now-sub">About 15 seconds, with sound.</p>
     </div>
-    <button id="now-action" class="btn btn-small" type="button" hidden></button>
-    <button id="mute" class="btn btn-small btn-quiet" type="button" aria-pressed="false">Sound on</button>
   </div>
 </header>
 <main>

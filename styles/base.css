@@ -37,8 +37,7 @@ body {
   position: absolute;
   inset: 0 0 0 auto;
   width: 70%;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+  isolation: isolate; /* the clips stack among themselves, under anything drawn over the picture */
 }
 .stage-media {
   position: absolute;
@@ -47,6 +46,9 @@ body {
   height: 100%;
   display: block;
   object-fit: cover;
+  /* The picture fades into the page; the controls drawn over it do not. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
 }
 .stage-clip { opacity: 0; pointer-events: none; }
 .stage-clip.is-on { opacity: 1; }
@@ -74,6 +76,25 @@ body {
   backdrop-filter: blur(8px);
   user-select: none;
 }
+/* The speaker button is on the picture from the start, so the sound can be turned off before it begins. */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(23, 19, 15, 0.72);
+  color: var(--cream);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.icon-btn:hover { border-color: rgba(243, 236, 223, 0.45); }
+.icon-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn[aria-pressed='false'] .sound-off, .icon-btn[aria-pressed='true'] .sound-on { display: none; }
+.icon-btn[aria-pressed='true'] { color: var(--muted); }
 .hero::before {
   content: '';
   position: absolute;
@@ -128,11 +149,13 @@ h1 {
   gap: 8px;
 }
 .pick {
+  --pad: 5px;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 5px 5px 7px;
+  padding: var(--pad) var(--pad) 7px;
   border: 1px solid var(--line);
   border-radius: 11px;
   background: rgba(23, 19, 15, 0.72);
@@ -150,10 +173,28 @@ h1 {
   object-fit: cover;
   border-radius: 8px;
 }
+/* A small silent loop of the topper turning, laid over its still picture once it is playing. */
+.pick-clip {
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  width: calc(100% - 2 * var(--pad));
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.pick-clip.is-on { opacity: 1; }
 .pick:hover { border-color: rgba(243, 236, 223, 0.45); }
 .pick:active { transform: scale(0.98); }
 .pick:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 .pick[aria-pressed='true'] { border-color: var(--brass); color: var(--brass); }
+/* The chosen tile pulses until its clip starts, so the tap is answered at once. */
+.pick.is-placing { animation: placing 0.9s ease-in-out infinite; }
+@keyframes placing { 50% { border-color: rgba(208, 166, 96, 0.3); } }
+@media (prefers-reduced-motion: reduce) { .pick.is-placing { animation: none; } }
 .pick:disabled { cursor: default; opacity: 0.5; }
 .pick:disabled:hover { border-color: var(--line); }
 .pick:disabled span::after { content: ' (soon)'; color: var(--muted); }
@@ -198,36 +239,47 @@ h1 {
 .btn-small { min-height: 38px; padding: 0 16px; font-size: 0.9rem; background: var(--cream); color: var(--ink); white-space: nowrap; }
 .btn-quiet { background: transparent; color: var(--muted); border-color: var(--line); }
 
+/* The story strip: three steps that light up as the demo runs, and a line saying what is happening.
+   It is there from the start and keeps its size, so nothing moves when the story begins. */
 .now {
   position: absolute;
   z-index: 2;
   left: 50%;
   bottom: 28px;
   transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  max-width: calc(100% - 32px);
-  padding: 12px 14px 12px 18px;
+  width: min(380px, calc(100% - 32px));
+  padding: 14px 16px 12px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 18px;
   background: rgba(23, 19, 15, 0.82);
   backdrop-filter: blur(10px);
 }
-.now-dot {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--cranberry);
-  box-shadow: 0 0 0 4px rgba(168, 50, 47, 0.25);
+.now-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
 }
-.now[data-phase='station'] .now-dot { background: var(--brass); box-shadow: 0 0 0 4px rgba(208, 166, 96, 0.25); }
-.now-text { min-width: 0; }
+.now-steps li {
+  padding-top: 7px;
+  border-top: 3px solid var(--line);
+  font-size: 0.74rem;
+  line-height: 1.2;
+  color: rgba(194, 182, 163, 0.75);
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+/* Steps already done. */
+.now:is([data-phase='side'], [data-phase='returning'], [data-phase='station']) li:nth-child(1),
+.now[data-phase='station'] li:nth-child(2) { border-color: var(--muted); color: var(--muted); }
+/* The step happening now. */
+.now[data-phase='placing'] li:nth-child(1),
+.now:is([data-phase='side'], [data-phase='returning']) li:nth-child(2),
+.now[data-phase='station'] li:nth-child(3) { border-color: var(--brass); color: var(--brass); }
 .now-text p { margin: 0; }
 #now-title { font-weight: 500; font-size: 0.98rem; }
 #now-sub { font-size: 0.84rem; color: var(--muted); }
-#now-sub:empty { display: none; }
 
 @media (max-aspect-ratio: 5/4) {
   /* Narrow screens: the picture comes first, with the headline and the chooser straight under it,
@@ -255,19 +307,52 @@ h1 {
     order: 1;
     inset: auto;
     width: 100%;
-    height: 46svh;
-    min-height: 260px;
+    height: 42svh;
+    min-height: 240px;
     max-height: 620px;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
   }
-  .stage-tools { top: 12px; right: 12px; flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
-  h1 {
+  /* The player's display is near the bottom of the picture and changes when the side ends, so the
+     fade is kept short and the story strip sits under the picture instead of over it. */
+  .stage-media {
+    -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
+  }
+  .stage-tools {
+    top: 12px;
+    right: 12px;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: end;
+    justify-items: end;
+    gap: 8px;
+  }
+  .stage-tools #mute { grid-column: 2; grid-row: 1; }
+  .stage-tools #view { grid-column: 1; grid-row: 1; }
+  .stage-hint { grid-column: 1 / -1; grid-row: 2; }
+  .now {
+    position: relative;
     order: 2;
-    margin-top: -4px;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: auto;
+    margin: -4px 20px 0;
+    padding: 12px 14px 11px;
+    border-radius: 14px;
+    background: var(--bg-raised);
+    backdrop-filter: none;
+  }
+  .now-steps { margin-bottom: 8px; }
+  #now-title { font-size: 0.92rem; }
+  #now-sub { display: none; }
+  h1 {
+    order: 3;
+    margin-top: 18px;
     font-size: clamp(1.9rem, 7.4vw, 3.2rem);
   }
-  .chooser { order: 3; margin-top: 1.1rem; margin-inline: 0; }
+  .lede { order: 4; margin-top: 0.7rem; max-width: none; font-size: 1rem; line-height: 1.45; }
+  .lede-lead { display: none; }
+  .chooser { order: 5; margin-top: 1rem; margin-inline: 0; }
   .chooser-label, .chooser-line { margin-inline: 20px; }
   .chooser-label { margin-bottom: 0.6rem; }
   /* The toppers sit in one row that slides sideways. */
@@ -281,24 +366,8 @@ h1 {
     scrollbar-width: none;
   }
   .chooser-row::-webkit-scrollbar { display: none; }
-  .pick { flex: 0 0 104px; padding: 6px 6px 9px; font-size: 0.8rem; scroll-snap-align: start; }
-  .chooser-line { min-height: 0; }
-  /* The status bar sits in the flow under the chooser rather than over the picture. */
-  .now {
-    position: relative;
-    order: 4;
-    left: auto;
-    bottom: auto;
-    transform: none;
-    flex-wrap: wrap;
-    max-width: none;
-    margin: 14px 20px 0;
-    padding: 12px 14px;
-    border-radius: 16px;
-  }
-  .now-text { flex: 1 1 100%; }
-  .now-dot { display: none; }
-  .lede { order: 5; margin-top: 1.4rem; max-width: none; }
+  .pick { --pad: 6px; flex: 0 0 104px; padding: var(--pad) var(--pad) 9px; font-size: 0.8rem; scroll-snap-align: start; }
+  .chooser-line { min-height: 4.35em; } /* room for three lines, so the button below stays put */
   .actions { order: 6; margin-top: 1.1rem; }
   .fineprint { order: 7; margin-top: 0.9rem; }
 }

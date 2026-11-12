@@ -19,8 +19,8 @@ const READY = new Set(['reindeer', 'cabin', 'nativity']);
 const audio = new MusicBox();
 const el = (id) => document.getElementById(id);
 const ui = {
-  label: el('chooser-label'), line: el('chooser-line'), tools: el('stage-tools'), view: el('view'),
-  now: el('now'), title: el('now-title'), sub: el('now-sub'), action: el('now-action'), mute: el('mute'),
+  label: el('chooser-label'), line: el('chooser-line'), hint: el('stage-hint'), view: el('view'),
+  now: el('now'), title: el('now-title'), sub: el('now-sub'), mute: el('mute'), cta: el('cta'),
 };
 const picks = Array.from(document.querySelectorAll('.pick'));
 picks.forEach((pick) => { pick.disabled = !READY.has(pick.dataset.topper); });
@@ -31,22 +31,77 @@ const stage = new Stage(el('stage'), { reduceMotion });
 // phase: idle, placing, side, returning, station
 const s = { phase: 'idle', topper: null };
 
+// What the story strip says at each step: a headline and a smaller line under it.
 const COPY = {
-  placing: () => [`Placing the ${TOPPERS[s.topper].name}`, 'Starting side A'],
+  idle: () => ['Place a topper to start the record', 'About 15 seconds, with sound.'],
+  placing: () => [`Placing the ${TOPPERS[s.topper].name}`, 'The record starts turning.'],
   side: () => ['Playing side A from the record', 'A Winter Evening'],
-  returning: () => ['Side A has finished', 'The arm lifts off and parks itself.'],
-  station: () => ['The side is over. The topper keeps playing.', `${STATIONS[s.topper].name}, stored on the topper. No subscription.`],
+  returning: () => ['Side A is over', 'The arm lifts off and parks itself.'],
+  station: () => ['The side is over. The topper plays on.', `${STATIONS[s.topper].name}, stored on the topper.`],
+};
+const LABEL = {
+  idle: () => 'Choose a topper to place it. Plays with sound.',
+  station: () => 'Try another topper',
 };
 
 function setPhase(phase) {
   s.phase = phase;
-  ui.now.hidden = phase === 'idle';
   ui.now.dataset.phase = phase;
-  if (phase === 'idle') return;
   [ui.title.textContent, ui.sub.textContent] = COPY[phase]();
-  ui.action.hidden = !(phase === 'side' || phase === 'station');
-  ui.action.textContent = phase === 'side' ? 'End the side now' : 'Start again';
+  ui.label.textContent = (LABEL[phase] || (() => `On the record: ${TOPPERS[s.topper].name}`))();
+  picks.forEach((pick) => {
+    pick.setAttribute('aria-pressed', String(pick.dataset.topper === s.topper));
+    pick.classList.toggle('is-placing', phase === 'placing' && pick.dataset.topper === s.topper);
+  });
+  // Once the topper has taken over, joining the waitlist becomes the main thing to do, and stays so.
+  if (phase === 'station') ui.cta.classList.replace('btn-ghost', 'btn-primary');
+  // The tiles hold still while the story runs, so the eye stays on the picture.
+  tiles.run(phase === 'idle' || phase === 'station');
 }
+
+// The chooser tiles: each ready topper turns in a small silent loop laid over its still picture.
+// A tile keeps its still if the loop is missing, or if the phone will not play it unasked.
+const tiles = {
+  clips: [],
+  running: true,
+  start() {
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    const seen = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        target.dataset.seen = isIntersecting ? '1' : '';
+        this.sync(target);
+      });
+    }, { threshold: 0.25 });
+    picks.filter((pick) => READY.has(pick.dataset.topper)).forEach((pick) => {
+      const clip = document.createElement('video');
+      clip.className = 'pick-clip';
+      clip.muted = true;
+      clip.loop = true;
+      clip.playsInline = true;
+      clip.preload = 'none';
+      clip.tabIndex = -1;
+      clip.setAttribute('aria-hidden', 'true');
+      clip.src = `assets/tile-${pick.dataset.topper}.mp4`;
+      clip.addEventListener('playing', () => clip.classList.add('is-on'), { once: true });
+      clip.addEventListener('error', () => {
+        seen.unobserve(clip);
+        this.clips.splice(this.clips.indexOf(clip), 1);
+        clip.remove();
+      });
+      pick.prepend(clip);
+      this.clips.push(clip);
+      seen.observe(clip);
+    });
+  },
+  sync(clip) {
+    if (this.running && clip.dataset.seen) clip.play().catch(() => {});
+    else clip.pause();
+  },
+  run(running) {
+    this.running = running;
+    this.clips.forEach((clip) => this.sync(clip));
+  },
+};
 
 // Each step of the story waits, then carries on only if nothing newer has started since.
 let step = 0;
@@ -60,10 +115,12 @@ function showView() {
   ui.view.textContent = stage.view === 'close' ? 'Show the whole player' : 'Show the close-up';
 }
 stage.onLive = (live) => {
-  ui.tools.hidden = !live;
+  ui.hint.hidden = !live;
+  ui.view.hidden = !live;
   showView();
 };
 
+// The side is short, and ends by itself.
 async function playSide() {
   step++;
   setPhase('side');
@@ -77,31 +134,40 @@ async function endSide() {
   const mine = ++step;
   setPhase('returning');
   audio.stopSide();
-  await stage.finish(s.topper, () => {
-    if (mine !== step) return;
+  const handover = () => {
+    if (mine !== step || s.phase === 'station') return;
     audio.startStation(STATIONS[s.topper].songs);
     setPhase('station');
-  });
+  };
+  try {
+    await stage.finish(s.topper, handover);
+  } catch {
+    handover(); // the ending clip did not load: the music still hands over
+  }
   showView();
 }
 
-// Starting again places the same topper afresh and plays the side from the top.
-function startAgain() {
-  if (s.phase !== 'station') return;
-  const id = s.topper;
+// Under the tiles: a word about the chosen topper, or, before one is chosen, about those still to come.
+const IDLE_LINE = READY.size < picks.length ? 'The toppers marked “soon” are still being made.' : '';
+ui.line.textContent = IDLE_LINE;
+
+// Back to the start, when a topper's clip cannot be fetched.
+function giveUp() {
+  stage.reset();
   s.topper = null;
-  choose(id);
+  setPhase('idle');
+  ui.line.textContent = IDLE_LINE;
+  ui.title.textContent = 'That topper did not load. Choose it again.';
+  ui.sub.textContent = 'If it keeps happening, check your connection.';
 }
 
 // Putting a topper on the record always starts the side again, whichever topper was there before.
+// Once the story has finished, choosing the same topper plays it again.
 async function choose(id) {
-  if (id === s.topper || !READY.has(id)) return;
+  if (!READY.has(id) || (id === s.topper && s.phase !== 'station')) return;
   const mine = ++step;
   s.topper = id;
-  const topper = TOPPERS[id];
-  picks.forEach((pick) => pick.setAttribute('aria-pressed', String(pick.dataset.topper === id)));
-  ui.label.textContent = `On the record: ${topper.name}`;
-  ui.line.textContent = topper.line;
+  ui.line.textContent = TOPPERS[id].line;
 
   audio.ensure();
   audio.stopSide();
@@ -111,22 +177,33 @@ async function choose(id) {
   if (stacked.matches && el('stage').getBoundingClientRect().top < 0) {
     el('top').scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
   }
-  await stage.place(id);
+  try {
+    await stage.place(id);
+  } catch {
+    if (mine === step) giveUp();
+    return;
+  }
   if (mine === step) playSide();
 }
 
-picks.forEach((pick) => pick.addEventListener('click', () => choose(pick.dataset.topper)));
+picks.forEach((pick) => {
+  pick.addEventListener('click', () => choose(pick.dataset.topper));
+  // Start fetching a topper's placing clip as soon as the pointer or the keyboard reaches its tile.
+  const warm = () => { if (READY.has(pick.dataset.topper) && pick.dataset.topper !== s.topper) stage.warm(pick.dataset.topper); };
+  pick.addEventListener('pointerenter', warm);
+  pick.addEventListener('focus', warm);
+});
 ui.view.addEventListener('click', async () => {
   await stage.setView(s.topper, stage.view === 'close' ? 'wide' : 'close');
   showView();
 });
-ui.action.addEventListener('click', () => (s.phase === 'side' ? endSide() : startAgain()));
 ui.mute.addEventListener('click', () => {
   const muted = !audio.muted;
   audio.setMuted(muted);
-  ui.mute.textContent = muted ? 'Sound off' : 'Sound on';
   ui.mute.setAttribute('aria-pressed', String(muted));
+  ui.mute.title = muted ? 'Sound is off' : 'Sound is on';
 });
+tiles.start();
 
 // Handy when checking the page by hand.
 window.__roundabout = { state: s, stage, choose, endSide };

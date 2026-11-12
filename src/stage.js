@@ -20,10 +20,24 @@ const HANDOVER_SECONDS = 2.0; // how far into the end clip the display changes o
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ended = (video) => new Promise((resolve) => video.addEventListener('ended', resolve, { once: true }));
 
+const LOAD_SECONDS = 20; // how long to wait for a clip before giving up on it
+
+// Resolves once a clip has a frame to show; fails if it cannot be fetched or takes too long.
 const ready = (video) =>
-  new Promise((resolve) => {
-    if (video.readyState >= 2) resolve();
-    else video.addEventListener('loadeddata', resolve, { once: true });
+  new Promise((resolve, reject) => {
+    if (video.readyState >= 2) return resolve();
+    if (video.error) return reject(new Error('clip failed to load'));
+    const done = (act) => () => {
+      clearTimeout(timer);
+      video.removeEventListener('loadeddata', loaded);
+      video.removeEventListener('error', failed);
+      act();
+    };
+    const loaded = done(resolve);
+    const failed = done(() => reject(new Error('clip failed to load')));
+    const timer = setTimeout(failed, LOAD_SECONDS * 1000);
+    video.addEventListener('loadeddata', loaded);
+    video.addEventListener('error', failed);
   });
 
 export class Stage {
@@ -52,21 +66,51 @@ export class Stage {
       this.cache.set(src, fetch(src).then((reply) => {
         if (!reply.ok) throw new Error(`${src}: ${reply.status}`);
         return reply.blob();
-      }).then((blob) => URL.createObjectURL(blob)));
+      }).then((blob) => URL.createObjectURL(blob)).catch((error) => {
+        this.cache.delete(src); // so that asking again tries again
+        throw error;
+      }));
     }
     return this.cache.get(src);
   }
 
   async _load(video, src, loop) {
     video.loop = loop;
-    if (video.dataset.src !== src) {
-      video.dataset.src = src;
-      const from = loop ? await this._whole(src) : src;
-      if (video.dataset.src !== src) return; // something newer was asked for meanwhile
-      video.src = from;
-      video.load();
+    try {
+      if (video.dataset.src !== src) {
+        video.dataset.src = src;
+        const from = loop ? await this._whole(src) : src;
+        if (video.dataset.src !== src) return; // something newer was asked for meanwhile
+        video.preload = 'auto';
+        video.src = from;
+        video.load();
+      }
+      await ready(video);
+    } catch (error) {
+      if (video.dataset.src === src) delete video.dataset.src; // so that asking again tries again
+      throw error;
     }
-    await ready(video);
+  }
+
+  // Start fetching a topper's placing clip before it is asked for, into the clip that is not on show.
+  warm(id) {
+    if (this.reduceMotion || (this.front && !this.live)) return;
+    const clip = this._back() || this.clips[0];
+    if (clip.classList.contains('is-on')) return; // still fading out from the last change
+    this._load(clip, `assets/place-${id}.mp4`, false).catch(() => {});
+  }
+
+  // Back to the still picture of the player on its own.
+  reset() {
+    this.job++;
+    this.clips.forEach((clip) => {
+      clip.pause();
+      clip.classList.remove('is-on', 'fade');
+    });
+    this.front = null;
+    this.parked = false;
+    this.view = 'close';
+    this._setLive(false);
   }
 
   _bring(video, fade) {
@@ -245,5 +289,7 @@ export class Stage {
     };
     root.addEventListener('pointerup', release);
     root.addEventListener('pointercancel', release);
+    // A mouse would otherwise pick the still picture up as an image to drag away, which ends the turn.
+    root.addEventListener('dragstart', (event) => event.preventDefault());
   }
 }
