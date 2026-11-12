@@ -1,0 +1,163 @@
+// The picture in the hero: pre-rendered clips, layered so one can take over from another
+// without a flash, and a looping clip that can be turned by hand.
+//
+// Each topper has three clips, all rendered from the same scene:
+//   place-<id>.mp4   the topper arrives, the record spins up, the arm goes on, the camera pushes in
+//   close-<id>.mp4   one turn of the record seen close up, looping
+//   wide-<id>.mp4    the same turn seen with the whole player in view, looping
+// The placing clip ends one frame before the close loop begins, so they join without a seam.
+// The two loops are in step with each other, so the view can change mid-turn.
+
+const TURN_SECONDS = 1.8; // one turn of the record
+// How far a drag turns the record: dragging this share of the picture's width is 1/pi of a turn.
+// Half the width the topper's base really spans, so a short drag turns it a good way.
+const BASE_SPAN = { close: 0.25, wide: 0.15 };
+
+const ready = (video) =>
+  new Promise((resolve) => {
+    if (video.readyState >= 2) resolve();
+    else video.addEventListener('loadeddata', resolve, { once: true });
+  });
+
+export class Stage {
+  constructor(root, { reduceMotion = false } = {}) {
+    this.root = root;
+    this.reduceMotion = reduceMotion;
+    this.clips = Array.from(root.querySelectorAll('.stage-clip'));
+    this.front = null;   // the clip on show
+    this.job = 0;        // goes up whenever something new is asked for, so stale steps can stop
+    this.view = 'close';
+    this.live = false;   // true while a loop is on show and can be turned by hand
+    this.onLive = () => {};
+    this.cache = new Map(); // loop clips already fetched, by address
+    this._drag();
+  }
+
+  _back() {
+    return this.clips.find((clip) => clip !== this.front);
+  }
+
+  // Loops are fetched whole and played from memory. That makes every frame reachable at once when
+  // the record is turned by hand, whether or not the server can send parts of a file on request.
+  _whole(src) {
+    if (!this.cache.has(src)) {
+      this.cache.set(src, fetch(src).then((reply) => {
+        if (!reply.ok) throw new Error(`${src}: ${reply.status}`);
+        return reply.blob();
+      }).then((blob) => URL.createObjectURL(blob)));
+    }
+    return this.cache.get(src);
+  }
+
+  async _load(video, src, loop) {
+    video.loop = loop;
+    if (video.dataset.src !== src) {
+      video.dataset.src = src;
+      const from = loop ? await this._whole(src) : src;
+      if (video.dataset.src !== src) return; // something newer was asked for meanwhile
+      video.src = from;
+      video.load();
+    }
+    await ready(video);
+  }
+
+  _bring(video, fade) {
+    const old = this.front;
+    video.classList.toggle('fade', fade);
+    video.style.zIndex = 2;
+    video.classList.add('is-on');
+    if (old && old !== video) {
+      old.style.zIndex = 1;
+      // Leave the old clip under the new one until the new one is fully opaque.
+      setTimeout(() => {
+        if (this.front !== old) {
+          old.classList.remove('is-on', 'fade');
+          old.pause();
+        }
+      }, fade ? 400 : 0);
+    }
+    this.front = video;
+  }
+
+  _setLive(live) {
+    this.live = live;
+    this.root.classList.toggle('is-live', live);
+    this.onLive(live);
+  }
+
+  // Play a topper's placing clip, then hand over to its close loop.
+  async place(id) {
+    const job = ++this.job;
+    this._setLive(false);
+    this.view = 'close';
+    if (this.reduceMotion) return this._loop(id, 'close', 0, job, true);
+
+    const clip = this._back() || this.clips[0];
+    await this._load(clip, `assets/place-${id}.mp4`, false);
+    if (job !== this.job) return false;
+    clip.currentTime = 0;
+    this._bring(clip, true);
+    clip.play().catch(() => {});
+
+    // Get the loop ready underneath while the placing clip plays.
+    const next = this._back();
+    const loaded = this._load(next, `assets/close-${id}.mp4`, true).then(() => { next.currentTime = 0; });
+    await new Promise((resolve) => clip.addEventListener('ended', resolve, { once: true }));
+    await loaded;
+    if (job !== this.job) return false;
+    this._bring(next, false);
+    next.play().catch(() => {});
+    this._setLive(true);
+    return true;
+  }
+
+  async _loop(id, view, time, job, fade) {
+    const clip = this._back() || this.clips[0];
+    await this._load(clip, `assets/${view}-${id}.mp4`, true);
+    if (job !== this.job) return false;
+    clip.currentTime = time;
+    this._bring(clip, fade);
+    if (!this.reduceMotion) clip.play().catch(() => {});
+    this.view = view;
+    this._setLive(true);
+    return true;
+  }
+
+  // Change between the close-up and the whole player, keeping the record where it is in its turn.
+  setView(id, view) {
+    if (!this.live || view === this.view) return Promise.resolve(false);
+    return this._loop(id, view, this.front.currentTime % TURN_SECONDS, ++this.job, true);
+  }
+
+  // Drag sideways to turn the record by hand; let go and it carries on turning.
+  _drag() {
+    const root = this.root;
+    let from = null;
+    const secondsPerPixel = () => {
+      const box = root.getBoundingClientRect();
+      const pictureWidth = Math.max(box.width, (box.height * 16) / 9); // the clip is scaled to cover the stage
+      return TURN_SECONDS / (Math.PI * BASE_SPAN[this.view] * pictureWidth);
+    };
+    root.addEventListener('pointerdown', (event) => {
+      if (!this.live || event.button > 0 || event.target.closest('button')) return;
+      from = { x: event.clientX, time: this.front.currentTime, rate: secondsPerPixel(), id: event.pointerId };
+      this.front.pause();
+      root.setPointerCapture(event.pointerId);
+      root.classList.add('is-turning');
+    });
+    root.addEventListener('pointermove', (event) => {
+      if (!from || event.pointerId !== from.id) return;
+      // The record turns clockwise, so its near side moves right to left as time runs forward.
+      const time = from.time - (event.clientX - from.x) * from.rate;
+      this.front.currentTime = ((time % TURN_SECONDS) + TURN_SECONDS) % TURN_SECONDS;
+    });
+    const release = (event) => {
+      if (!from || event.pointerId !== from.id) return;
+      from = null;
+      root.classList.remove('is-turning');
+      if (this.live && !this.reduceMotion) this.front.play().catch(() => {});
+    };
+    root.addEventListener('pointerup', release);
+    root.addEventListener('pointercancel', release);
+  }
+}

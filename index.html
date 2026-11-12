@@ -14,9 +14,14 @@
 </head>
 <body>
 <header class="hero" id="top">
-  <div class="stage">
+  <div class="stage" id="stage">
     <img class="stage-media" id="stage-still" src="assets/player.jpg" width="1920" height="1080" alt="A walnut and brass record player with its clear cover open and a record on the platter">
-    <video class="stage-media" id="stage-video" muted loop playsinline preload="none" hidden></video>
+    <video class="stage-media stage-clip" muted playsinline preload="none" tabindex="-1" aria-hidden="true"></video>
+    <video class="stage-media stage-clip" muted playsinline preload="none" tabindex="-1" aria-hidden="true"></video>
+    <div class="stage-tools" id="stage-tools" hidden>
+      <p class="stage-hint">Drag to turn it by hand</p>
+      <button id="view" class="btn btn-small btn-quiet" type="button">Show the whole player</button>
+    </div>
   </div>
   <div class="hero-copy">
     <p class="wordmark">Roundabout</p>

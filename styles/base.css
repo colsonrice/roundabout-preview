@@ -48,8 +48,32 @@ body {
   display: block;
   object-fit: cover;
 }
-#stage-video { opacity: 0; transition: opacity 0.45s ease; }
-#stage-video.is-on { opacity: 1; }
+.stage-clip { opacity: 0; pointer-events: none; }
+.stage-clip.is-on { opacity: 1; }
+.stage-clip.fade { transition: opacity 0.35s ease; }
+/* While a loop is showing, dragging sideways turns the record by hand. */
+.stage.is-live { cursor: grab; touch-action: pan-y; }
+.stage.is-turning { cursor: grabbing; }
+.stage-tools {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  right: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stage-tools .btn { background: rgba(23, 19, 15, 0.72); color: var(--cream); backdrop-filter: blur(8px); }
+.stage-hint {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(23, 19, 15, 0.6);
+  font-size: 0.82rem;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+  user-select: none;
+}
 .hero::before {
   content: '';
   position: absolute;
@@ -234,6 +258,7 @@ h1 {
     -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
     mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
   }
+  .stage-tools { top: 12px; right: 12px; flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
   h1 {
     order: 2;
     margin-top: -4px;
