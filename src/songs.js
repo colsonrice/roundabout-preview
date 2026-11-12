@@ -31,18 +31,16 @@ function build({ title, melody, chords, beatsPerBar, bpm, transpose = 12 }) {
   return { title, notes, duration: chords.length * beatsPerBar * spb };
 }
 
+// The record side in the demo: the opening of the carol only, so the side is over in about ten
+// seconds and ends on a held note rather than being cut off.
 export const SIDE = build({
   title: 'Silent Night',
-  bpm: 108,
+  bpm: 116,
   beatsPerBar: 3,
   melody: `
     G4:1.5 A4:.5 G4:1  E4:3  G4:1.5 A4:.5 G4:1  E4:3
-    D5:2 D5:1  B4:3  C5:2 C5:1  G4:3
-    A4:2 A4:1  C5:1.5 B4:.5 A4:1  G4:1.5 A4:.5 G4:1  E4:3
-    A4:2 A4:1  C5:1.5 B4:.5 A4:1  G4:1.5 A4:.5 G4:1  E4:3
-    D5:2 D5:1  F5:1.5 D5:.5 B4:1  C5:3  E5:3
-    C5:1 G4:1 E4:1  G4:1.5 F4:.5 D4:1  C4:3  -:3`,
-  chords: ['C', 'C', 'C', 'C', 'G', 'G', 'C', 'C', 'F', 'F', 'C', 'C', 'F', 'F', 'C', 'C', 'G', 'G', 'C', 'C', 'C', 'G', 'C', 'C'],
+    D5:2 D5:1  B4:3`,
+  chords: ['C', 'C', 'C', 'C', 'G', 'G'],
 });
 
 const DECK = build({
