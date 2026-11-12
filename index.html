@@ -42,6 +42,30 @@
           <img src="assets/topper-nativity.jpg" width="1280" height="720" alt="">
           <span>Nativity</span>
         </button>
+        <button class="pick" type="button" data-topper="nutcracker" aria-pressed="false">
+          <img src="assets/topper-nutcracker.jpg" width="1280" height="720" alt="">
+          <span>Nutcracker</span>
+        </button>
+        <button class="pick" type="button" data-topper="swan" aria-pressed="false">
+          <img src="assets/topper-swan.jpg" width="1280" height="720" alt="">
+          <span>Swan Lake</span>
+        </button>
+        <button class="pick" type="button" data-topper="jazz" aria-pressed="false">
+          <img src="assets/topper-jazz.jpg" width="1280" height="720" alt="">
+          <span>Jazz Trio</span>
+        </button>
+        <button class="pick" type="button" data-topper="city" aria-pressed="false">
+          <img src="assets/topper-city.jpg" width="1280" height="720" alt="">
+          <span>City at Night</span>
+        </button>
+        <button class="pick" type="button" data-topper="hotel" aria-pressed="false">
+          <img src="assets/topper-hotel.jpg" width="1280" height="720" alt="">
+          <span>Desert Hotel</span>
+        </button>
+        <button class="pick" type="button" data-topper="orrery" aria-pressed="false">
+          <img src="assets/topper-orrery.jpg" width="1280" height="720" alt="">
+          <span>Orrery</span>
+        </button>
       </div>
       <p class="chooser-line" id="chooser-line" aria-live="polite"></p>
     </div>
@@ -88,7 +112,7 @@
 <section class="sx-section" id="toppers" aria-labelledby="sx-toppers-title">
   <div class="sx-wrap">
     <h2 class="sx-title" id="sx-toppers-title">More toppers</h2>
-    <p class="sx-intro">The three toppers above are only the first ideas. A topper can be any scene that looks good turning once every 1.8 seconds, in any season. Here are a few more we are thinking about.</p>
+    <p class="sx-intro">The nine toppers above are only the first ideas. A topper can be any scene that looks good turning once every 1.8 seconds, in any season. Here are a few more we are thinking about.</p>
     <fieldset class="sx-vote">
       <legend class="sx-legend">Which would you want first?</legend>
       <p class="sx-hint" id="sx-vote-hint">Pick one. It is a vote, and it carries into the waitlist form below.</p>
@@ -111,7 +135,7 @@
             <span class="sx-mark" aria-hidden="true"></span>
             <img class="sx-art sx-photo" src="assets/topper-cabin.jpg" width="1280" height="720" alt="">
             <span class="sx-card-name">Mill Cabin</span>
-            <span class="sx-card-line">A log cabin with a turning mill wheel and smoke rising from the chimney.</span>
+            <span class="sx-card-line">A log cabin that stays still while its mill wheel turns and smoke rises from the chimney.</span>
             <span class="sx-tag">In the preview above</span>
           </span>
         </label>
@@ -127,30 +151,69 @@
           </span>
         </label>
 
-        <label class="sx-card">
-          <input class="sx-radio" type="radio" name="topper" value="jazz-trio">
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="nutcracker">
           <span class="sx-card-body">
             <span class="sx-mark" aria-hidden="true"></span>
-            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
-              <path d="M56 16h8l6 10H50z"/>
-              <rect x="59" y="6" width="2" height="10"/>
-              <circle cx="26" cy="58" r="6"/>
-              <path d="M19 67h14l2 30H17z"/>
-              <ellipse cx="42" cy="88" rx="10" ry="14"/>
-              <rect x="40.5" y="50" width="3" height="30"/>
-              <circle cx="62" cy="64" r="6"/>
-              <path d="M55 72h14l1 22H54z"/>
-              <rect x="52" y="96" width="20" height="10" rx="2"/>
-              <rect x="70" y="72" width="14" height="2"/>
-              <circle cx="96" cy="60" r="6"/>
-              <path d="M89 68h14v26H89z"/>
-              <rect x="78" y="82" width="34" height="4"/>
-              <rect x="80" y="86" width="3" height="20"/>
-              <rect x="107" y="86" width="3" height="20"/>
-              <rect x="10" y="108" width="100" height="2"/>
-            </svg>
-            <span class="sx-card-name">Jazz trio</span>
-            <span class="sx-card-line">Piano, bass and drums in a quiet room, turning under one lamp.</span>
+            <img class="sx-art sx-photo" src="assets/topper-nutcracker.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Nutcracker</span>
+            <span class="sx-card-line">A nutcracker soldier with three dancers pirouetting round him.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="swan">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-swan.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Swan Lake</span>
+            <span class="sx-card-line">Swans gliding round a moonlit lake, past a castle on a rock.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="jazz">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-jazz.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Jazz Trio</span>
+            <span class="sx-card-line">Piano, bass and drums turning under one lamp.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="city">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-city.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">City at Night</span>
+            <span class="sx-card-line">A lit skyline with a train, taxis and a biplane circling it.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="hotel">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-hotel.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Desert Hotel</span>
+            <span class="sx-card-line">A desert hotel with palms, and a car on the highway round it.</span>
+            <span class="sx-tag">In the preview above</span>
+          </span>
+        </label>
+
+        <label class="sx-card sx-card-current">
+          <input class="sx-radio" type="radio" name="topper" value="orrery">
+          <span class="sx-card-body">
+            <span class="sx-mark" aria-hidden="true"></span>
+            <img class="sx-art sx-photo" src="assets/topper-orrery.jpg" width="1280" height="720" alt="">
+            <span class="sx-card-name">Orrery</span>
+            <span class="sx-card-line">A brass clockwork of the planets, turning round a still sun.</span>
+            <span class="sx-tag">In the preview above</span>
           </span>
         </label>
 
@@ -218,28 +281,6 @@
           </span>
         </label>
 
-        <label class="sx-card">
-          <input class="sx-radio" type="radio" name="topper" value="skyline">
-          <span class="sx-card-body">
-            <span class="sx-mark" aria-hidden="true"></span>
-            <svg class="sx-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" fill="currentColor">
-              <circle cx="94" cy="24" r="9"/>
-              <circle cx="20" cy="18" r="1.5"/>
-              <circle cx="46" cy="12" r="1.5"/>
-              <circle cx="68" cy="22" r="1.5"/>
-              <rect x="8" y="70" width="16" height="40"/>
-              <rect x="26" y="52" width="12" height="58"/>
-              <rect x="40" y="40" width="18" height="70"/>
-              <rect x="48" y="28" width="2" height="12"/>
-              <rect x="60" y="62" width="14" height="48"/>
-              <rect x="76" y="48" width="18" height="62"/>
-              <rect x="96" y="74" width="16" height="36"/>
-            </svg>
-            <span class="sx-card-name">City at night</span>
-            <span class="sx-card-line">A skyline under a low moon, going quietly round.</span>
-          </span>
-        </label>
-
       </div>
     </fieldset>
   </div>
@@ -264,12 +305,15 @@
           <option value="reindeer">Reindeer Carousel</option>
           <option value="cabin">Mill Cabin</option>
           <option value="nativity">Nativity</option>
-          <option value="jazz-trio">Jazz trio</option>
+          <option value="nutcracker">Nutcracker</option>
+          <option value="swan">Swan Lake</option>
+          <option value="jazz">Jazz Trio</option>
+          <option value="city">City at Night</option>
+          <option value="hotel">Desert Hotel</option>
+          <option value="orrery">Orrery</option>
           <option value="ballerina">Ballerina</option>
           <option value="lighthouse">Lighthouse at sea</option>
           <option value="carousel">Carousel horses</option>
-          <option value="skyline">City at night</option>
-
         </select>
       </div>
       <button class="btn btn-primary sx-submit" id="sx-submit" type="submit">Join the waitlist</button>

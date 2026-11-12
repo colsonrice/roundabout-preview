@@ -1,4 +1,4 @@
-import { SIDE, STATION } from './songs.js';
+import { SIDE } from './songs.js';
 
 // A music box built from sine partials. The "record" path rolls off the highs; the "station"
 // path is clean with a light echo, so the handover from record to topper is audible.
@@ -102,10 +102,12 @@ export class MusicBox {
     this.side = null;
   }
 
-  startStation() {
+  // Plays a topper's own songs, one after another, until stopped.
+  startStation(songs) {
     this.ensure();
+    this.stopStation();
     const next = () => {
-      const song = STATION[this.stationIndex % STATION.length];
+      const song = songs[this.stationIndex % songs.length];
       this.stationIndex++;
       this.station = this._play(song, this.stationBus, 0.3);
       this.stationTimer = setTimeout(next, (song.duration + 1.2) * 1000);

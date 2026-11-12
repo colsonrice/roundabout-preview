@@ -29,7 +29,7 @@ body {
 .hero {
   position: relative;
   height: 100svh;
-  min-height: 640px;
+  min-height: 720px;
   overflow: hidden;
 }
 /* The picture: the player on its own, then a clip of the chosen topper turning on the record. */
@@ -124,20 +124,20 @@ h1 {
 }
 .chooser-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
 }
 .pick {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 8px 8px 10px;
+  padding: 5px 5px 7px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 11px;
   background: rgba(23, 19, 15, 0.72);
   color: var(--cream);
-  font: 500 0.86rem/1.25 var(--body);
+  font: 500 0.72rem/1.2 var(--body);
   text-align: left;
   cursor: pointer;
   transition: border-color 0.15s ease, transform 0.15s ease;
@@ -154,6 +154,9 @@ h1 {
 .pick:active { transform: scale(0.98); }
 .pick:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 .pick[aria-pressed='true'] { border-color: var(--brass); color: var(--brass); }
+.pick:disabled { cursor: default; opacity: 0.5; }
+.pick:disabled:hover { border-color: var(--line); }
+.pick:disabled span::after { content: ' (soon)'; color: var(--muted); }
 .chooser-line {
   margin: 0.8rem 0 0;
   min-height: 2.9em;
@@ -264,9 +267,21 @@ h1 {
     margin-top: -4px;
     font-size: clamp(1.9rem, 7.4vw, 3.2rem);
   }
-  .chooser { order: 3; margin-top: 1.1rem; }
+  .chooser { order: 3; margin-top: 1.1rem; margin-inline: 0; }
+  .chooser-label, .chooser-line { margin-inline: 20px; }
   .chooser-label { margin-bottom: 0.6rem; }
-  .pick { padding: 6px 6px 9px; font-size: 0.82rem; }
+  /* The toppers sit in one row that slides sideways. */
+  .chooser-row {
+    display: flex;
+    gap: 10px;
+    padding: 2px 20px 6px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 20px;
+    scrollbar-width: none;
+  }
+  .chooser-row::-webkit-scrollbar { display: none; }
+  .pick { flex: 0 0 104px; padding: 6px 6px 9px; font-size: 0.8rem; scroll-snap-align: start; }
   .chooser-line { min-height: 0; }
   /* The status bar sits in the flow under the chooser rather than over the picture. */
   .now {

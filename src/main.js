@@ -1,11 +1,20 @@
 import { MusicBox } from './audio.js';
+import { STATIONS } from './songs.js';
 import { Stage } from './stage.js';
 
 const TOPPERS = {
   reindeer: { name: 'Reindeer Carousel', line: 'The tree stands still while reindeer and a sleigh gallop round it.' },
   cabin: { name: 'Mill Cabin', line: 'The cabin stays still while the record turns beneath it. Gears spin the mill wheel and twist smoke from the chimney.' },
   nativity: { name: 'Nativity', line: 'The stable stays facing you while three kings circle it on camels.' },
+  nutcracker: { name: 'Nutcracker', line: 'The soldier stands still while three dancers pirouette round him on the gears.' },
+  swan: { name: 'Swan Lake', line: 'A castle and a crescent moon stand still while swans glide round the lake.' },
+  jazz: { name: 'Jazz Trio', line: 'Piano, bass and drums turn under one still lamp, swaying in time.' },
+  city: { name: 'City at Night', line: 'The skyline stands still while a train, taxis and a biplane circle it.' },
+  hotel: { name: 'Desert Hotel', line: 'The hotel stays still while a car drives the desert highway round it.' },
+  orrery: { name: 'Orrery', line: 'The sun stays still while gears carry the planets and the moon round it.' },
 };
+// Toppers whose clips are rendered and on the site. The rest show in the chooser as coming soon.
+const READY = new Set(['reindeer', 'cabin', 'nativity']);
 
 const audio = new MusicBox();
 const el = (id) => document.getElementById(id);
@@ -14,6 +23,7 @@ const ui = {
   now: el('now'), title: el('now-title'), sub: el('now-sub'), action: el('now-action'), mute: el('mute'),
 };
 const picks = Array.from(document.querySelectorAll('.pick'));
+picks.forEach((pick) => { pick.disabled = !READY.has(pick.dataset.topper); });
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stacked = window.matchMedia('(max-aspect-ratio: 5/4)'); // narrow screens: the picture sits above the words
 const stage = new Stage(el('stage'), { reduceMotion });
@@ -24,8 +34,8 @@ const s = { phase: 'idle', topper: null };
 const COPY = {
   placing: () => [`Placing the ${TOPPERS[s.topper].name}`, 'Starting side A'],
   side: () => ['Playing side A from the record', 'A Winter Evening'],
-  returning: () => ['Side A has finished', 'The topper takes over.'],
-  station: () => ['The side is over. The topper keeps playing.', 'Winter station, stored on the topper. No subscription.'],
+  returning: () => ['Side A has finished', 'The arm lifts off and parks itself.'],
+  station: () => ['The side is over. The topper keeps playing.', `${STATIONS[s.topper].name}, stored on the topper. No subscription.`],
 };
 
 function setPhase(phase) {
@@ -35,7 +45,7 @@ function setPhase(phase) {
   if (phase === 'idle') return;
   [ui.title.textContent, ui.sub.textContent] = COPY[phase]();
   ui.action.hidden = !(phase === 'side' || phase === 'station');
-  ui.action.textContent = phase === 'side' ? 'End the side now' : 'Play side A again';
+  ui.action.textContent = phase === 'side' ? 'End the side now' : 'Start again';
 }
 
 // Each step of the story waits, then carries on only if nothing newer has started since.
@@ -60,25 +70,32 @@ async function playSide() {
   if (await pause(audio.startSide())) endSide();
 }
 
+// The side ends: the picture shows the arm lifting off and the display changing over, and the
+// topper's own music starts at the moment the display changes.
 async function endSide() {
   if (s.phase !== 'side') return;
-  step++;
+  const mine = ++step;
   setPhase('returning');
   audio.stopSide();
-  if (!(await pause(2.2))) return;
-  audio.startStation();
-  setPhase('station');
+  await stage.finish(s.topper, () => {
+    if (mine !== step) return;
+    audio.startStation(STATIONS[s.topper].songs);
+    setPhase('station');
+  });
+  showView();
 }
 
-function replaySide() {
+// Starting again places the same topper afresh and plays the side from the top.
+function startAgain() {
   if (s.phase !== 'station') return;
-  audio.stopStation();
-  playSide();
+  const id = s.topper;
+  s.topper = null;
+  choose(id);
 }
 
 // Putting a topper on the record always starts the side again, whichever topper was there before.
 async function choose(id) {
-  if (id === s.topper) return;
+  if (id === s.topper || !READY.has(id)) return;
   const mine = ++step;
   s.topper = id;
   const topper = TOPPERS[id];
@@ -103,7 +120,7 @@ ui.view.addEventListener('click', async () => {
   await stage.setView(s.topper, stage.view === 'close' ? 'wide' : 'close');
   showView();
 });
-ui.action.addEventListener('click', () => (s.phase === 'side' ? endSide() : replaySide()));
+ui.action.addEventListener('click', () => (s.phase === 'side' ? endSide() : startAgain()));
 ui.mute.addEventListener('click', () => {
   const muted = !audio.muted;
   audio.setMuted(muted);
