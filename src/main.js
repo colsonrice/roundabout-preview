@@ -14,7 +14,7 @@ const TOPPERS = {
   orrery: { name: 'Orrery', line: 'The sun stays still while gears carry the planets and the moon round it.' },
 };
 // Toppers whose clips are rendered and on the site. The rest show in the chooser as coming soon.
-const READY = new Set(['reindeer', 'cabin', 'nativity', 'jazz', 'hotel', 'orrery']);
+const READY = new Set(['reindeer', 'cabin', 'nativity', 'jazz', 'hotel', 'orrery', 'city']);
 
 const audio = new MusicBox();
 const el = (id) => document.getElementById(id);
